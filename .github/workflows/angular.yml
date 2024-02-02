@@ -43,4 +43,4 @@ jobs:
         context: .
         file: Dockerfile.gha
         push: true
-        tags: rg.fr-par.scw.cloud/polytech2024/guillaume/angular:v1
+        tags: rg.fr-par.scw.cloud/exampolytech2024/guillaume/angular:v1
