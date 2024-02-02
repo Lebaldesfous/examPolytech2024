@@ -1,0 +1,11 @@
+FROM nginx:latest
+
+WORKDIR /app
+
+COPY nginx/ /etc/nginx/
+
+COPY * /usr/share/nginx/html
+
+LABEL maintaineur="Guillaume HUET"
+
+COPY entrypoint.sh /docker-entrypoint.d/entrypoint.sh
