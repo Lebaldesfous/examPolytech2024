@@ -1,0 +1,63 @@
+volumes:
+  database:
+  
+
+networks:
+  network:
+
+services:
+  database:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD:password
+      - MYSQL_DATABASE:database
+
+    volumes:
+      - database:/var/lib/mysql
+    networks:
+      - network
+    healthcheck:
+      test: mysqladmin  ping -h localhost -u root -p$password
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  java:
+    image: java
+    build:
+      context: java/
+      dockerfile: Dockerfile
+    container_name: java
+    depends_on:
+      database:
+        condition: service_healthy
+        restart: true
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/database
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+    networks:
+      - network
+    ports:
+      - '8448:8448'
+    healthcheck:
+      test: curl http://localhost:8448/actuator/health
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  angular:
+    image: angular
+    build:
+      context: angular/
+      dockerfile: Dockerfile
+    container_name: angular
+    depends_on:
+      java:
+        condition: service_healthy
+        restart: true
+    ports:
+      - '8001:80'
+    environment:
+      - BACKEND_URL=http://localhost:8448
+      
